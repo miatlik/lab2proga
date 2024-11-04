@@ -8,20 +8,12 @@
 #include <locale.h>
 #include <ctime>
 void vvodkolodi(int arr[]) {
-    int p, c;
-    p = 6;
-    c = 0;
-    for (int i = 0; i < 24; i++) {
-        arr[i] = p;
-        c += 1;
-        if (c == 4) { c = 0; p += 1; }
-    }
+    int p;
     p = 1;
-    c = 0;
-    for (int i = 24; i < 36; i++) {
+    
+    for (int i = 0; i < 11; i++) {
         arr[i] = p;
-        c += 1;
-        if (c == 4) { c = 0; p += 1; }
+        p += 1;
     }
 }
 int viborkarti(int arr[], int *size){
@@ -39,20 +31,35 @@ int viborkarti(int arr[], int *size){
     return randc;
 }
 
+
+void rukastart(int* score, int rand) {
+    *score = *score + rand;
+}
+
 int main()
 {
-    int arr[36], ri, n;
+    int arr[12], ri, n, opsc, mysc;
     char ch;
-    n = 36;
+    opsc = 0;
+    mysc = 0;
+    n = 11;
     vvodkolodi(arr);
     for (int i = 0; i < n; i++)
         printf("%d ", arr[i]); 
-    do {
-    ri = viborkarti(arr,&n);
-    printf("\n%d\n", ri);
+    ri = viborkarti(arr, &n);
+    rukastart(&opsc, ri);
+    ri = viborkarti(arr, &n);
+    rukastart(&opsc, ri);
+    printf("\n%d\n",opsc);
     for (int i = 0; i < n; i++)
         printf("%d ", arr[i]);
-    } while ((ch = _getch()) != 'q');
+    ri = viborkarti(arr, &n);
+    rukastart(&mysc, ri);
+    ri = viborkarti(arr, &n);
+    rukastart(&mysc, ri);
+    printf("\n%d\n", mysc);
+    for (int i = 0; i < n; i++)
+        printf("%d ", arr[i]);
 }
 
 // Запуск программы: CTRL+F5 или меню "Отладка" > "Запуск без отладки"
