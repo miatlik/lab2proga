@@ -1,11 +1,38 @@
 ﻿// lab2proga.cpp : Этот файл содержит функцию "main". Здесь начинается и заканчивается выполнение программы.
 //
 
-#include <iostream>
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+#include <conio.h>
+#include <locale.h>
+#include <ctime>
+void vvodkolodi(int arr[]) {
+    int p, c;
+    p = 6;
+    c = 0;
+    for (int i = 0; i < 24; i++) {
+        arr[i] = p;
+        c += 1;
+        if (c == 4) { c = 0; p += 1; }
+    }
+    p = 1;
+    c = 0;
+    for (int i = 24; i < 36; i++) {
+        arr[i] = p;
+        c += 1;
+        if (c == 4) { c = 0; p += 1; }
+    }
+}
+
 
 int main()
 {
-    std::cout << "Hello World!\n";
+    int arr[36], ri;
+    vvodkolodi(arr);
+    for (int i = 0; i < 36; i++)
+        printf("%d ", arr[i]); 
+    
 }
 
 // Запуск программы: CTRL+F5 или меню "Отладка" > "Запуск без отладки"
