@@ -35,31 +35,94 @@ void rukabota(int score[], int arr[], int *size) {
     score[t2] = ri;
     t2++;
 }
+void vivodrukamy(int mysc[],int sum) {
+    printf("\nМои карты: ");
+    for (int i = 0; i < t1; i++)
+        printf("%d, ", mysc[i]);
+    for (int i = 0; i < t1; i++)
+        sum += mysc[i];
+    printf("%d/21", sum);
+    sum = 0;
+}
+void vivodrukabota(int opsc[], int sum) {
+    printf("\nКарты противника: ?,  ");
+    for (int i = 1; i < t2; i++)
+        printf("%d, ", opsc[i]);
+    for (int i = 1; i < t2; i++)
+        sum += opsc[i];
+    printf("?+%d/21", sum);
+    sum = 0;
+}
+void vivodreza(int mysc[], int opsc[]) {
+    int sum1 = 0, sum2 = 0;
+    for (int i = 0; i < t1; i++)
+        sum1 += mysc[i];
+    for (int i = 0; i < t2; i++)
+        sum2 += opsc[i];
+    if (sum1 > 21 && sum2 < 21) printf("У вас перебор. Вы проиграли\n");
+    if (sum2 > 21 && sum1 < 21) printf("У противника перебор. Вы выиграли\n");
+    if (sum1 > 21 && sum2 > 21 && sum1 < sum2) printf("У вас и противника перебор.Вы выиграли, так как имеете меньше очков\n");
+    if (sum1 > 21 && sum2 > 21 && sum1 > sum2) printf("У вас и противника перебор.Вы проиграли, так как имеете больше очков\n");
+    if (sum1 < 21 && sum2 < 21 && sum1 < sum2) printf("Вы проиграли. Противник ближе к 21 очку\n");
+    if (sum1 < 21 && sum2 < 21 && sum1 > sum2) printf("Вы выиграли. Вы ближе к 21 очку\n");
+    if (sum1 == sum2) printf("Ничья\n");
+}
 int main()
 {
     setlocale(LC_ALL, "Rus");
-    int arr[11], ri1, ri2, ri3, ri4, n, opsc[10], mysc[10], i=0;
+    int arr[11], n, opsc[10], mysc[10], i,sum,f1=1,f2=1,take, randbot;
     char ch;
     srand(time(NULL));
+    sum = 0;
     n = 11;
     vvodkolodi(arr);
-    for (int i = 0; i < n; i++)
-        printf("%d ", arr[i]);
     printf("\n");
     rukamy(mysc, arr,&n);
     rukamy(mysc, arr, &n);
     rukabota(opsc, arr, &n);
     rukabota(opsc, arr, &n);
-    for (i = 0; i < t1; i++)
-        printf("%d ", mysc[i]);
-    printf("\n");
-    for (i = 0; i < t2; i++)
-        printf("%d ", opsc[i]);
-    printf("\n");
-    for (int i = 0; i < n; i++)
-        printf("%d ", arr[i]);
-    printf("\n");
-    printf("%d", n);
+    vivodrukamy(mysc, sum);
+    vivodrukabota(opsc, sum);
+    while (f1 == 1 || f2 == 1) {
+        if (f1 == 1) {
+            printf("\nНажмите 1, чтобы тянуть карту\n");
+            printf("Нажмите 2, чтобы спасовать\n");
+            while (scanf("%d", &take) != 1 || take < 1 || take >2) {
+                while (getchar() != '\n'); printf("Ошибка. Выберите играть или пасовать: ");
+            }
+            while (getchar() != '\n');
+            if (take == 1) rukamy(mysc, arr, &n);
+
+            if (take == 2) {
+                printf("Вы спасовали");
+                f1 = 0;
+            }
+        }
+        randbot = rand() % 2;
+        if (randbot == 0 && f2 == 1) rukabota(opsc, arr, &n);
+        if (randbot == 1) {
+            printf("\nПротивник спасовал");
+            f2 = 0;
+        }
+        vivodrukamy(mysc, sum);
+        if (f1 == 1) {
+            vivodrukabota(opsc, sum);
+        }
+        else {
+            printf("\nКарты противника: ");
+            for (i = 0; i < t2; i++)
+                printf("%d, ", opsc[i]);
+            for (i = 0; i < t2; i++)
+                sum += opsc[i];
+            printf("%d/21", sum);
+            sum = 0;
+            printf("\n");
+        }
+        if (f1 == 0 && f2 == 0) vivodreza(mysc, opsc);
+    }
+
+
+    
 }
 
 // Запуск программы: CTRL+F5 или меню "Отладка" > "Запуск без отладки"
