@@ -24,15 +24,35 @@ void vvodkolodi(int arr[]) {
         if (c == 4) { c = 0; p += 1; }
     }
 }
-
+int viborkarti(int arr[], int *size){
+    int ri, randc, i, j;
+    srand(time(NULL));
+    ri = rand() % *size;
+    randc = arr[ri];
+    for (i = 0; i < *size; i++) {
+        if (arr[i] == randc) {
+            for (j = i; j < *size - 1; j++) arr[j] = arr[j + 1];
+            (*size)--;
+            break;
+        }
+    }
+    return randc;
+}
 
 int main()
 {
-    int arr[36], ri;
+    int arr[36], ri, n;
+    char ch;
+    n = 36;
     vvodkolodi(arr);
-    for (int i = 0; i < 36; i++)
+    for (int i = 0; i < n; i++)
         printf("%d ", arr[i]); 
-    
+    do {
+    ri = viborkarti(arr,&n);
+    printf("\n%d\n", ri);
+    for (int i = 0; i < n; i++)
+        printf("%d ", arr[i]);
+    } while ((ch = _getch()) != 'q');
 }
 
 // Запуск программы: CTRL+F5 или меню "Отладка" > "Запуск без отладки"
