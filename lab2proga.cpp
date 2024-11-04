@@ -7,59 +7,59 @@
 #include <conio.h>
 #include <locale.h>
 #include <ctime>
+int t1=0, t2=0;
 void vvodkolodi(int arr[]) {
-    int p;
-    p = 1;
-    
     for (int i = 0; i < 11; i++) {
-        arr[i] = p;
-        p += 1;
+        arr[i] = i+1;
     }
 }
 int viborkarti(int arr[], int *size){
     int ri, randc, i, j;
-    srand(time(NULL));
     ri = rand() % *size;
     randc = arr[ri];
-    for (i = 0; i < *size; i++) {
-        if (arr[i] == randc) {
-            for (j = i; j < *size - 1; j++) arr[j] = arr[j + 1];
-            (*size)--;
-            break;
-        }
-    }
+    for (int i = ri; i < *size - 1; i++) arr[i] = arr[i + 1];
+            (*size)--;   
     return randc;
 }
 
 
-void rukastart(int* score, int rand) {
-    *score = *score + rand;
+void rukamy(int score[], int arr[], int *size) {
+    int ri;
+    score[t1] = viborkarti(arr, size);
+    t1++;
+    
 }
-
+void rukabota(int score[], int arr[], int *size) {
+    int ri;
+    ri = viborkarti(arr, size);
+    score[t2] = ri;
+    t2++;
+}
 int main()
 {
-    int arr[12], ri, n, opsc, mysc;
+    setlocale(LC_ALL, "Rus");
+    int arr[11], ri1, ri2, ri3, ri4, n, opsc[10], mysc[10], i=0;
     char ch;
-    opsc = 0;
-    mysc = 0;
+    srand(time(NULL));
     n = 11;
     vvodkolodi(arr);
     for (int i = 0; i < n; i++)
-        printf("%d ", arr[i]); 
-    ri = viborkarti(arr, &n);
-    rukastart(&opsc, ri);
-    ri = viborkarti(arr, &n);
-    rukastart(&opsc, ri);
-    printf("\n%d\n",opsc);
+        printf("%d ", arr[i]);
+    printf("\n");
+    rukamy(mysc, arr,&n);
+    rukamy(mysc, arr, &n);
+    rukabota(opsc, arr, &n);
+    rukabota(opsc, arr, &n);
+    for (i = 0; i < t1; i++)
+        printf("%d ", mysc[i]);
+    printf("\n");
+    for (i = 0; i < t2; i++)
+        printf("%d ", opsc[i]);
+    printf("\n");
     for (int i = 0; i < n; i++)
         printf("%d ", arr[i]);
-    ri = viborkarti(arr, &n);
-    rukastart(&mysc, ri);
-    ri = viborkarti(arr, &n);
-    rukastart(&mysc, ri);
-    printf("\n%d\n", mysc);
-    for (int i = 0; i < n; i++)
-        printf("%d ", arr[i]);
+    printf("\n");
+    printf("%d", n);
 }
 
 // Запуск программы: CTRL+F5 или меню "Отладка" > "Запуск без отладки"
