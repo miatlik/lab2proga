@@ -7,55 +7,76 @@
 #include <conio.h>
 #include <locale.h>
 #include <ctime>
-int t1=0, t2=0;
+#define MAX_CARDS 11
+#define MAX_HAND 10
+
+typedef struct {
+    int value; // Значение карты
+} Card;
+
+typedef struct {
+    Card hand[MAX_HAND]; // Массив карт игрока
+    int cardCount; // Количество карт в руке
+} Player;
+//Ввод игральной колоды с очками от 1 до 11
 void vvodkolodi(int arr[]) {
-    for (int i = 0; i < 11; i++) {
-        arr[i] = i+1;
+    for (int i = 0; i < MAX_CARDS; i++) {
+        arr[i] = i + 1;
     }
 }
-int viborkarti(int arr[], int *size){
+//Случайный выбор карты из колоды(выбор числа из массива и удаление его из этого массива)
+int viborkarti(int arr[], int* size) {
     int ri, randc;
     ri = rand() % *size;
     randc = arr[ri];
     for (int i = ri; i < *size - 1; i++) arr[i] = arr[i + 1];
-            (*size)--;   
+    (*size)--;
     return randc;
 }
-void rukamy(int score[], int arr[], int *size) {
-    score[t1] = viborkarti(arr, size);
-    t1++;
-    
+//Взятие карты игроком 
+void rukamy(Player* player, int arr[], int* size) {
+    if (player->cardCount < MAX_HAND) {
+        player->hand[player->cardCount].value = viborkarti(arr, size);
+        player->cardCount++;
+    }
 }
-void rukabota(int score[], int arr[], int *size) {
-    int ri;
-    ri = viborkarti(arr, size);
-    score[t2] = ri;
-    t2++;
+//Взятие карты противником
+void rukabota(Player* opponent, int arr[], int* size) {
+    if (opponent->cardCount < MAX_HAND) {
+        opponent->hand[opponent->cardCount].value = viborkarti(arr, size);
+        opponent->cardCount++;
+    }
 }
-void vivodrukamy(int mysc[],int sum) {
+//Вывод моих карт и их суммы очков
+void vivodrukamy(Player* player) {
+    int sum = 0;
     printf("\nМои карты: ");
-    for (int i = 0; i < t1; i++)
-        printf("%d, ", mysc[i]);
-    for (int i = 0; i < t1; i++)
-        sum += mysc[i];
+    for (int i = 0; i < player->cardCount; i++) {
+        printf("%d, ", player->hand[i].value);
+        sum += player->hand[i].value;
+    }
     printf("%d/21", sum);
-    sum = 0;
 }
-void vivodrukabota(int opsc[], int sum) {
+//Вывод карт противника с учетом первой скрытой карты и суммы очков без первой карты
+void vivodrukabota(Player* opponent) {
+    int sum = 0;
     printf("\nКарты противника: ?,  ");
-    for (int i = 1; i < t2; i++)
-        printf("%d, ", opsc[i]);
-    for (int i = 1; i < t2; i++)
-        sum += opsc[i];
+    for (int i = 1; i < opponent->cardCount; i++) {
+        printf("%d, ", opponent->hand[i].value);
+        sum += opponent->hand[i].value;
+    }
     printf("?+%d/21", sum);
-    sum = 0;
 }
-void vivodreza(int mysc[], int opsc[]) {
+//Подсчет очков моих и противника и вывод результата игры
+void vivodreza(Player* player, Player* opponent) {
     int sum1 = 0, sum2 = 0;
-    for (int i = 0; i < t1; i++)
-        sum1 += mysc[i];
-    for (int i = 0; i < t2; i++)
-        sum2 += opsc[i];
+
+    for (int i = 0; i < player->cardCount; i++)
+        sum1 += player->hand[i].value;
+
+    for (int i = 0; i < opponent->cardCount; i++)
+        sum2 += opponent->hand[i].value;
+    // Логика определения результата
     if (sum1 > 21 && sum2 < 22) printf("У вас перебор. Вы проиграли\n");
     if (sum2 > 21 && sum1 < 22) printf("У противника перебор. Вы выиграли\n");
     if (sum1 > 21 && sum2 > 21 && sum1 < sum2) printf("У вас и противника перебор.Вы выиграли, так как имеете меньше очков\n");
@@ -64,76 +85,78 @@ void vivodreza(int mysc[], int opsc[]) {
     if (sum1 < 22 && sum2 < 22 && sum1 > sum2) printf("Вы выиграли. Вы ближе к 21 очку\n");
     if (sum1 == sum2) printf("Ничья\n");
 }
-int reshenie_ai(int opsc[]) {
+//Простейший искусственный интелект для противника, который берет карту если у него меньше 17 очков
+int reshenie_ai(Player* opponent) {
     int sum = 0, randbot = 1;
-    for (int i = 0; i < t2; i++)
-        sum += opsc[i];
+    for (int i = 0; i < opponent->cardCount; i++)
+        sum += opponent->hand[i].value;
     if (sum < 17) randbot = 0;
     return randbot;
 }
-int main()
-{
+
+int main() {
     setlocale(LC_ALL, "Rus");
     char ch;
-    do{
-    int arr[11], n, opsc[10], mysc[10], sum, f1 = 1, f2 = 1, take, per = 0;
-    t1 = 0;
-    t2 = 0;
-    srand(time(NULL));
-    sum = 0;
-    n = 11;
-    vvodkolodi(arr);
-    printf("\n");
-    rukamy(mysc, arr, &n);
-    rukamy(mysc, arr, &n);
-    rukabota(opsc, arr, &n);
-    rukabota(opsc, arr, &n);
-    vivodrukamy(mysc, sum);
-    vivodrukabota(opsc, sum);
-    while (f1 == 1 || f2 == 1) {
-        if (f1 == 1) {
-            printf("\nНажмите 1, чтобы тянуть карту\n");
-            printf("Нажмите 2, чтобы спасовать\n");
-            while (scanf("%d", &take) != 1 || take < 1 || take >2) {
-                while (getchar() != '\n'); printf("Ошибка. Выберите 1 или 2: ");
+
+    do {
+        int arr[MAX_CARDS], n, sum, f1 = 1, f2 = 1, take, per = 0;
+        Player player = { player.cardCount = 0 }; // Инициализация игрока
+        Player opponent = { opponent.cardCount = 0 }; // Инициализация противника
+        srand(time(NULL));
+        sum = 0;
+        n = MAX_CARDS;
+        vvodkolodi(arr);
+        printf("\n");
+        //Начальная раздача карт и вывод того, что взяли
+        rukamy(&player, arr, &n);
+        rukamy(&player, arr, &n);
+        rukabota(&opponent, arr, &n);
+        rukabota(&opponent, arr, &n);
+        vivodrukamy(&player);
+        vivodrukabota(&opponent);
+        //Основная игра с возможностью брать карту или пасовать, противник также берет карту или пасует
+        while (f1 == 1 || f2 == 1) {
+            if (f1 == 1) {
+                printf("\nНажмите 1, чтобы тянуть карту\n");
+                printf("Нажмите 2, чтобы спасовать\n");
+                while (scanf("%d", &take) != 1 || take < 1 || take > 2) {
+                    while (getchar() != '\n');
+                    printf("Ошибка. Выберите 1 или 2: ");
+                }
+                while (getchar() != '\n');
+                for (int i = 0; i < player.cardCount; i++)
+                    sum += player.hand[i].value;
+                if (sum > 21) per = 1;
+                sum = 0;
+                if (take == 1) {
+                    if (per == 0) rukamy(&player, arr, &n);
+                    else printf("Нельзя брать карту при переборе\n");
+                }
+                else {
+                    printf("Вы спасовали");
+                    f1 = 0;
+                }
             }
-            while (getchar() != '\n');
-            for (int i = 0; i < t1; i++)
-                sum += mysc[i];
-            if (sum > 21) per = 1;
-            sum = 0;
-            if (take == 1) {
-                if (per == 0) rukamy(mysc, arr, &n);
-                else printf("Нельзя брать карту при переборе\n");
+            if (reshenie_ai(&opponent) == 0 && f2 == 1) rukabota(&opponent, arr, &n);
+            if (reshenie_ai(&opponent) == 1 && f2 == 1) {
+                printf("\nПротивник спасовал");
+                f2 = 0;
+            }
+            vivodrukamy(&player);
+            if (f1 == 1) {
+                vivodrukabota(&opponent);
             }
             else {
-                printf("Вы спасовали");
-                f1 = 0;
+                sum = 0;
+                printf("\nКарты противника: ");
+                for (int i = 0; i < opponent.cardCount; i++)
+                    printf("%d, ", opponent.hand[i].value);
+                for (int i = 0; i < opponent.cardCount; i++) sum += opponent.hand[i].value;
+                printf("%d/21\n", sum);
             }
+            if (f1 == 0 && f2 == 0) vivodreza(&player, &opponent);
         }
-        reshenie_ai(opsc);
-        if (reshenie_ai(opsc) == 0 && f2 == 1) rukabota(opsc, arr, &n);
-        if (reshenie_ai(opsc) == 1 && f2 == 1) {
-            printf("\nПротивник спасовал");
-            f2 = 0;
-        }
-        vivodrukamy(mysc, sum);
-        if (f1 == 1) {
-            vivodrukabota(opsc, sum);
-        }
-        else {
-            printf("\nКарты противника: ");
-            for (int i = 0; i < t2; i++)
-                printf("%d, ", opsc[i]);
-            for (int i = 0; i < t2; i++)
-                sum += opsc[i];
-            printf("%d/21", sum);
-            sum = 0;
-            printf("\n");
-        }
-        if (f1 == 0 && f2 == 0) vivodreza(mysc, opsc);
-    }
-    puts("\nНажмите q, чтобы выйти или любую другую клавишу, чтобы сыграть заново\n\n");
+        puts("\nНажмите q, чтобы выйти или любую другую клавишу, чтобы сыграть заново\n\n");
     } while ((ch = _getch()) != 'q');
 }
 
